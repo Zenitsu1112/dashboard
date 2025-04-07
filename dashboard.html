@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <title>My Personal Dashboard</title>
@@ -28,7 +29,8 @@
 
     .video-bg {
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       width: 100vw;
       height: 100vh;
       object-fit: cover;
@@ -76,8 +78,10 @@
     .slider {
       position: absolute;
       cursor: pointer;
-      top: 0; left: 0;
-      right: 0; bottom: 0;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
       background-color: #ccc;
       transition: .4s;
       border-radius: 30px;
@@ -86,7 +90,8 @@
     .slider:before {
       position: absolute;
       content: "";
-      height: 20px; width: 20px;
+      height: 20px;
+      width: 20px;
       left: 3px;
       bottom: 3px;
       background-color: white;
@@ -94,11 +99,11 @@
       border-radius: 50%;
     }
 
-    input:checked + .slider {
+    input:checked+.slider {
       background-color: var(--accent);
     }
 
-    input:checked + .slider:before {
+    input:checked+.slider:before {
       transform: translateX(24px);
     }
 
@@ -132,7 +137,7 @@
       background-color: var(--card);
       padding: 1rem;
       border-radius: 1rem;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       transition: transform 0.2s;
       text-align: center;
       text-decoration: none;
@@ -156,6 +161,7 @@
     }
   </style>
 </head>
+
 <body>
 
   <!-- Background Video -->
@@ -206,6 +212,13 @@
     <a href="metadata.html" class="card" data-name="Metadata Extractor">
       <img src="https://img.icons8.com/color/96/image.png" alt="Metadata Extractor">
       <div class="card-title">Metadata Extractor</div>
+    </a>
+
+    <a href="pdf-image-tool.html" class="card" data-name="PDF ↔ Image Tool">
+      <img
+        src="https://img.icons8.com/external-flat-icons-inmotus-design/96/external-pdf-file-file-flat-icons-inmotus-design.png"
+        alt="PDF Image Tool">
+      <div class="card-title">PDF ↔ Image Tool</div>
     </a>
   </div>
 
@@ -264,4 +277,5 @@
   </script>
 
 </body>
+
 </html>

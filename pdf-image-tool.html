@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PDF ⇄ Image Converter</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0f172a;
+      color: #fff;
+      margin: 0;
+      padding: 2rem;
+    }
+    .container {
+      max-width: 700px;
+      margin: auto;
+      text-align: center;
+    }
+    .dropzone {
+      border: 2px dashed #60a5fa;
+      padding: 40px;
+      border-radius: 10px;
+      margin-bottom: 2rem;
+      background: #1e293b;
+      cursor: pointer;
+    }
+    .dropzone:hover {
+      background-color: #334155;
+    }
+    button {
+      margin: 1rem;
+      padding: 0.7rem 1.5rem;
+      font-size: 1rem;
+      background: #60a5fa;
+      border: none;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #preview canvas {
+      margin-top: 10px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>PDF ⇄ Image Converter</h2>
+
+    <div id="dropzone" class="dropzone">
+      <p>Drag & drop PDF or images here</p>
+      <input type="file" id="fileInput" multiple accept=".pdf, image/*" hidden>
+    </div>
+
+    <div>
+      <button onclick="convertImagesToPDF()">Images to PDF</button>
+      <button onclick="convertPDFToImages()">PDF to Images</button>
+    </div>
+
+    <div id="preview"></div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+
+  <script>
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const preview = document.getElementById('preview');
+    let selectedFiles = [];
+
+    dropzone.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', e => {
+      selectedFiles = [...e.target.files];
+      dropzone.querySelector('p').textContent = `${selectedFiles.length} file(s) selected`;
+    });
+
+    dropzone.addEventListener('dragover', e => {
+      e.preventDefault();
+      dropzone.style.backgroundColor = '#334155';
+    });
+
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.style.backgroundColor = '#1e293b';
+    });
+
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      selectedFiles = [...e.dataTransfer.files];
+      dropzone.querySelector('p').textContent = `${selectedFiles.length} file(s) selected`;
+    });
+
+    async function convertImagesToPDF() {
+      if (!selectedFiles.length) return alert("Select image(s) first!");
+
+      const pdf = new jsPDF();
+      let isFirst = true;
+
+      for (const file of selectedFiles) {
+        if (!file.type.startsWith('image/')) continue;
+
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+
+        await new Promise(resolve => {
+          img.onload = () => {
+            const width = pdf.internal.pageSize.getWidth();
+            const height = (img.height / img.width) * width;
+
+            if (!isFirst) pdf.addPage();
+            isFirst = false;
+            pdf.addImage(img, 'JPEG', 0, 0, width, height);
+            resolve();
+          };
+        });
+      }
+
+      pdf.save("converted.pdf");
+    }
+
+    async function convertPDFToImages() {
+      const pdfFile = selectedFiles.find(f => f.type === "application/pdf");
+      if (!pdfFile) return alert("Please drop a PDF file.");
+
+      preview.innerHTML = "Rendering...";
+
+      const arrayBuffer = await pdfFile.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+      preview.innerHTML = "";
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const viewport = page.getViewport({ scale: 1.5 });
+        const canvas = document.createElement("canvas");
+        const context = canvas.getContext("2d");
+
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+
+        await page.render({ canvasContext: context, viewport: viewport }).promise;
+
+        preview.appendChild(canvas);
+      }
+    }
+  </script>
+</body>
+</html>
