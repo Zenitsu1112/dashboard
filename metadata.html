@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Image Metadata Extractor</title>
+  <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 2rem;
+    }
+    h2 {
+      color: #fbbf24;
+    }
+    .drop-zone {
+      border: 2px dashed #64748b;
+      padding: 2rem;
+      text-align: center;
+      margin-top: 1rem;
+      border-radius: 1rem;
+    }
+    .drop-zone.dragover {
+      background: #334155;
+      color: #fbbf24;
+    }
+    .output {
+      margin-top: 2rem;
+      background: #1e293b;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid #334155;
+      overflow-x: auto;
+    }
+    pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>📸 Metadata Extractor</h2>
+  <input type="file" id="imageInput" accept="image/*" />
+  <div class="drop-zone" id="dropZone">📂 Drag & Drop Image Here</div>
+
+  <div class="output" id="metadataOutput">
+    <p>🔍 Metadata will appear here after selecting an image.</p>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const dropZone = document.getElementById('dropZone');
+    const output = document.getElementById('metadataOutput');
+
+    function displayMetadata(exifData) {
+      output.innerHTML = '';
+      if (Object.keys(exifData).length === 0) {
+        output.innerHTML = '<p>⚠️ No EXIF metadata found.</p>';
+        return;
+      }
+
+      const readable = Object.entries(exifData).map(([key, value]) => {
+        return `<strong>${key}</strong>: ${value}`;
+      }).join('<br>');
+
+      const json = JSON.stringify(exifData, null, 2);
+
+      output.innerHTML = `
+        <h3>📄 Readable Info:</h3>
+        <div>${readable}</div>
+        <br>
+        <h3>🧾 Full JSON:</h3>
+        <pre>${json}</pre>
+      `;
+    }
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith("image")) {
+        output.innerHTML = "<p>❌ Please upload a valid image file.</p>";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        EXIF.getData(file, function() {
+          const allMetaData = EXIF.getAllTags(this);
+          displayMetadata(allMetaData);
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+
+    imageInput.addEventListener('change', () => {
+      handleFile(imageInput.files[0]);
+    });
+
+    dropZone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropZone.classList.add("dragover");
+    });
+
+    dropZone.addEventListener("dragleave", () => {
+      dropZone.classList.remove("dragover");
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropZone.classList.remove("dragover");
+      if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+      }
+    });
+  </script>
+
+</body>
+</html>

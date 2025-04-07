@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>IP & Device Logger</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #f9fafb;
+      color: #111827;
+      padding: 2rem;
+      max-width: 600px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .log-box {
+      background-color: #ffffff;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .log-entry {
+      margin-bottom: 1rem;
+    }
+
+    .label {
+      font-weight: 600;
+      color: #2563eb;
+    }
+  </style>
+</head>
+<body>
+  <h1>IP + Device Logger</h1>
+  <div class="log-box">
+    <div class="log-entry"><span class="label">Public IP:</span> <span id="ip">Loading...</span></div>
+    <div class="log-entry"><span class="label">Browser:</span> <span id="browser"></span></div>
+    <div class="log-entry"><span class="label">OS:</span> <span id="os"></span></div>
+    <div class="log-entry"><span class="label">Screen Size:</span> <span id="screen"></span></div>
+    <div class="log-entry"><span class="label">Timestamp:</span> <span id="timestamp"></span></div>
+  </div>
+
+  <script>
+    // Get IP
+    fetch('https://api.ipify.org?format=json')
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById('ip').textContent = data.ip;
+      })
+      .catch(() => {
+        document.getElementById('ip').textContent = 'Unavailable';
+      });
+
+    // Device info
+    const ua = navigator.userAgent;
+    document.getElementById('browser').textContent = navigator.userAgent;
+    document.getElementById('screen').textContent = `${screen.width} x ${screen.height}`;
+    document.getElementById('timestamp').textContent = new Date().toLocaleString();
+
+    // OS detection (simple)
+    let os = 'Unknown';
+    if (ua.indexOf('Win') !== -1) os = 'Windows';
+    else if (ua.indexOf('Mac') !== -1) os = 'macOS';
+    else if (ua.indexOf('Linux') !== -1) os = 'Linux';
+    else if (ua.indexOf('Android') !== -1) os = 'Android';
+    else if (ua.indexOf('like Mac') !== -1) os = 'iOS';
+
+    document.getElementById('os').textContent = os;
+  </script>
+</body>
+</html>

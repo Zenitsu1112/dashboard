@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My Personal Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: transparent;
+      --text: #ffffff;
+      --card: rgba(0, 0, 0, 0.7);
+      --accent: #60a5fa;
+    }
+
+    body.dark {
+      --text: #f1f5f9;
+      --card: rgba(30, 41, 59, 0.8);
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .video-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      object-fit: cover;
+      z-index: -1;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .search-bar {
+      padding: 0.6rem 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid #cbd5e1;
+      width: 300px;
+      max-width: 100%;
+      background-color: var(--card);
+      color: var(--text);
+    }
+
+    .controls-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 30px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px; width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: var(--accent);
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    .media-controls button {
+      background-color: var(--card);
+      color: var(--text);
+      border: none;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .media-controls button:hover {
+      transform: scale(1.1);
+      background-color: var(--accent);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background-color: var(--card);
+      padding: 1rem;
+      border-radius: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      transition: transform 0.2s;
+      text-align: center;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+    }
+
+    .card img {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      margin-bottom: 1rem;
+    }
+
+    .card-title {
+      font-weight: 600;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Video -->
+  <video autoplay muted loop class="video-bg" id="bgVideo">
+    <source src="video.mp4" type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+
+  <!-- Background Music -->
+  <audio id="bgMusic" src="audio.m4a" loop autoplay></audio>
+
+  <div class="header">
+    <input id="search" class="search-bar" type="text" placeholder="Search or enter #comein..." />
+
+    <div class="controls-wrapper">
+      <!-- Dark Mode -->
+      <label>Dark Mode</label>
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider"></span>
+      </label>
+
+      <!-- Media Controls -->
+      <div class="media-controls">
+        <button onclick="rewindAudio()">⏮️</button>
+        <button onclick="toggleAudio()" id="playPauseBtn">⏸️</button>
+        <button onclick="forwardAudio()">⏭️</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" id="toolGrid">
+    <a href="coderunner.html" class="card" data-name="Code Runner">
+      <img src="https://img.icons8.com/color/96/source-code.png" alt="Code Runner">
+      <div class="card-title">Code Runner</div>
+    </a>
+
+    <a href="vault.html" class="card" data-name="File Vault">
+      <img src="https://img.icons8.com/color/96/lock--v1.png" alt="File Vault">
+      <div class="card-title">Encrypted File Vault</div>
+    </a>
+
+    <a href="iplogger.html" class="card" data-name="IP Logger">
+      <img src="https://img.icons8.com/color/96/computer.png" alt="IP Logger">
+      <div class="card-title">IP + Device Logger</div>
+    </a>
+
+    <a href="metadata.html" class="card" data-name="Metadata Extractor">
+      <img src="https://img.icons8.com/color/96/image.png" alt="Metadata Extractor">
+      <div class="card-title">Metadata Extractor</div>
+    </a>
+  </div>
+
+  <script>
+    const searchInput = document.getElementById('search');
+    const grid = document.getElementById('toolGrid');
+    const darkToggle = document.getElementById('darkModeToggle');
+    const bgMusic = document.getElementById('bgMusic');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+
+    // Search filter
+    searchInput.addEventListener('input', () => {
+      const val = searchInput.value.trim().toLowerCase();
+      if (val === '#comein') {
+        window.location.href = 'secret.html';
+        return;
+      }
+
+      const cards = grid.querySelectorAll('.card');
+      cards.forEach(card => {
+        const name = card.getAttribute('data-name').toLowerCase();
+        card.style.display = name.includes(val) ? '' : 'none';
+      });
+    });
+
+    // Dark mode
+    darkToggle.addEventListener('change', () => {
+      document.body.classList.toggle('dark', darkToggle.checked);
+      localStorage.setItem('darkMode', darkToggle.checked);
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const isDark = localStorage.getItem('darkMode') === 'true';
+      darkToggle.checked = isDark;
+      document.body.classList.toggle('dark', isDark);
+    });
+
+    // Media controls
+    function toggleAudio() {
+      if (bgMusic.paused) {
+        bgMusic.play();
+        playPauseBtn.textContent = '⏸️';
+      } else {
+        bgMusic.pause();
+        playPauseBtn.textContent = '▶️';
+      }
+    }
+
+    function rewindAudio() {
+      bgMusic.currentTime = 0;
+    }
+
+    function forwardAudio() {
+      bgMusic.currentTime = bgMusic.duration - 1;
+    }
+  </script>
+
+</body>
+</html>

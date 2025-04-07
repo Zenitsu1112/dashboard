@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Encrypted Vault</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      padding: 2rem;
+      background: #0f172a;
+      color: #f1f5f9;
+    }
+    h2, h3 {
+      color: #fbbf24;
+    }
+    input, button {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      font-size: 1rem;
+      background: #1e293b;
+      color: #f8fafc;
+      border: 1px solid #475569;
+      border-radius: 0.375rem;
+    }
+    button {
+      cursor: pointer;
+      background: #3b82f6;
+      border: none;
+      color: white;
+    }
+    .section {
+      margin-bottom: 2rem;
+      background: #1e293b;
+      padding: 1rem;
+      border-radius: 0.75rem;
+      border: 1px solid #334155;
+    }
+    .drop-zone {
+      margin-top: 0.5rem;
+      padding: 1rem;
+      border: 2px dashed #64748b;
+      border-radius: 0.5rem;
+      text-align: center;
+      color: #94a3b8;
+    }
+    .drop-zone.dragover {
+      background: #334155;
+      border-color: #fbbf24;
+      color: #fbbf24;
+    }
+    .preview {
+      margin-top: 1rem;
+      max-width: 100%;
+      height: auto;
+      border-radius: 0.5rem;
+    }
+    embed.preview {
+      width: 100%;
+      height: 500px;
+    }
+    pre.preview {
+      background: #0f172a;
+      padding: 1rem;
+      border-radius: 0.5rem;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h2>🔐 Encrypted File Vault</h2>
+
+  <div class="section">
+    <h3>Encrypt a File</h3>
+    <input type="file" id="encryptInput" />
+    <div class="drop-zone" id="encryptDrop">📂 Drag & Drop File Here</div>
+    <br>
+    <input type="password" id="encryptPass" placeholder="Password" />
+    <br>
+    <button onclick="handleEncrypt()">Encrypt & Download</button>
+    <div id="encryptOutput"></div>
+  </div>
+
+  <div class="section">
+    <h3>Decrypt a File</h3>
+    <input type="file" id="decryptInput" />
+    <div class="drop-zone" id="decryptDrop">📂 Drag & Drop Encrypted File</div>
+    <br>
+    <input type="password" id="decryptPass" placeholder="Password" />
+    <br>
+    <button onclick="handleDecrypt()">Decrypt & Preview</button>
+    <div id="decryptOutput"></div>
+    <div id="previewArea"></div>
+  </div>
+
+  <script>
+    function handleEncrypt() {
+      const file = document.getElementById('encryptInput').files[0];
+      const password = document.getElementById('encryptPass').value;
+      const output = document.getElementById('encryptOutput');
+      output.textContent = '';
+
+      if (!file || !password) {
+        output.textContent = "Please select a file and enter a password.";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const wordArray = CryptoJS.lib.WordArray.create(e.target.result);
+        const encrypted = CryptoJS.AES.encrypt(wordArray, password).toString();
+
+        const blob = new Blob([encrypted], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = file.name + ".enc";
+        a.click();
+
+        output.textContent = "✅ File encrypted and downloaded.";
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function handleDecrypt() {
+      const password = document.getElementById('decryptPass').value;
+      const file = document.getElementById('decryptInput').files[0];
+      const output = document.getElementById('decryptOutput');
+      const previewArea = document.getElementById('previewArea');
+      output.textContent = '';
+      previewArea.innerHTML = '';
+
+      if (!file || !password) {
+        output.textContent = "Please select a .enc file and enter a password.";
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const decryptedBytes = CryptoJS.AES.decrypt(e.target.result, password);
+          const byteArr = new Uint8Array(decryptedBytes.sigBytes);
+          for (let i = 0; i < decryptedBytes.sigBytes; i++) {
+            byteArr[i] = (decryptedBytes.words[i >>> 2] >>> (24 - (i % 4) * 8)) & 0xff;
+          }
+
+          const blob = new Blob([byteArr], { type: "application/octet-stream" });
+          const url = URL.createObjectURL(blob);
+          const originalName = file.name.replace(/\.enc$/, "") || "decrypted";
+          const parts = originalName.split('.');
+          const ext = parts.length > 1 ? parts.pop().toLowerCase() : '';
+          console.log("Detected extension:", ext);
+
+          if (["png", "jpg", "jpeg", "gif", "webp"].includes(ext)) {
+            previewArea.innerHTML = `<img class="preview" src="${url}">`;
+          } else if (ext === "pdf") {
+            previewArea.innerHTML = `<embed class="preview" src="${url}" type="application/pdf">`;
+          } else if (["txt", "json", "log", "md"].includes(ext)) {
+            blob.text().then(text => {
+              previewArea.innerHTML = `<pre class="preview">${text}</pre>`;
+            });
+          } else {
+            previewArea.innerHTML = `<p>Preview not supported for .${ext}</p>`;
+          }
+
+          const downloadBtn = document.createElement("a");
+          downloadBtn.href = url;
+          downloadBtn.download = originalName;
+          downloadBtn.textContent = "⬇️ Download File";
+          downloadBtn.style.display = "inline-block";
+          downloadBtn.style.background = "#22c55e";
+          downloadBtn.style.color = "white";
+          downloadBtn.style.padding = "0.5rem 1rem";
+          downloadBtn.style.marginTop = "1rem";
+          downloadBtn.style.borderRadius = "0.5rem";
+          previewArea.appendChild(downloadBtn);
+
+          output.textContent = "✅ File decrypted successfully!";
+        } catch (err) {
+          output.textContent = "❌ Decryption failed: " + err.message;
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // Drag & drop handlers
+    function setupDrop(dropZoneId, inputId) {
+      const dropZone = document.getElementById(dropZoneId);
+      const fileInput = document.getElementById(inputId);
+
+      dropZone.addEventListener("dragover", e => {
+        e.preventDefault();
+        dropZone.classList.add("dragover");
+      });
+
+      dropZone.addEventListener("dragleave", () => {
+        dropZone.classList.remove("dragover");
+      });
+
+      dropZone.addEventListener("drop", e => {
+        e.preventDefault();
+        dropZone.classList.remove("dragover");
+        if (e.dataTransfer.files.length) {
+          fileInput.files = e.dataTransfer.files;
+        }
+      });
+    }
+
+    setupDrop("encryptDrop", "encryptInput");
+    setupDrop("decryptDrop", "decryptInput");
+  </script>
+</body>
+</html>

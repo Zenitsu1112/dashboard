@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>404 - Page Not Found</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f9fafb;
+      --text: #1f2937;
+      --accent: #3b82f6;
+    }
+    body.dark {
+      --bg: #0f172a;
+      --text: #f1f5f9;
+    }
+
+    body {
+      margin: 0;
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .ghost {
+      font-size: 6rem;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    h1 {
+      font-size: 4rem;
+      margin-bottom: 0.2rem;
+    }
+
+    #typing {
+      font-size: 1.25rem;
+      min-height: 1.5em;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid var(--text);
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { border-color: transparent; }
+    }
+
+    a {
+      text-decoration: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      background-color: var(--accent);
+      color: white;
+      font-weight: 600;
+      box-shadow: 0 4px 15px rgba(59,130,246,0.4);
+      margin-top: 2rem;
+      transition: transform 0.2s, box-shadow 0.3s;
+    }
+
+    a:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 18px rgba(59,130,246,0.6);
+    }
+  </style>
+</head>
+<body>
+  <div class="ghost">👻</div>
+  <h1>404</h1>
+  <div id="typing"></div>
+  <a href="dashboard.html">Back to Dashboard</a>
+
+  <script>
+    const typing = "Oops! This page seems to have vanished into the void...";
+    const typeSpeed = 40;
+    let i = 0;
+
+    function typeIt() {
+      if (i < typing.length) {
+        document.getElementById("typing").textContent += typing.charAt(i);
+        i++;
+        setTimeout(typeIt, typeSpeed);
+      }
+    }
+
+    typeIt();
+
+    // Enable dark mode from localStorage
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const saved = localStorage.getItem('darkMode');
+    const useDark = saved === "true" || (saved === null && prefersDark);
+    if (useDark) document.body.classList.add("dark");
+  </script>
+</body>
+</html>

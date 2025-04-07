@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <style>
+    body {
+      background: #0f172a;
+      color: white;
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-box {
+      background: #1e293b;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      width: 300px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.6rem;
+      margin: 0.5rem 0;
+      border: none;
+      border-radius: 0.5rem;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      background: #3b82f6;
+      border: none;
+      color: white;
+      border-radius: 0.5rem;
+      cursor: pointer;
+      margin-top: 1rem;
+      width: 100%;
+    }
+
+    .error {
+      color: #f87171;
+      margin-top: 0.5rem;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <div class="error" id="error-msg">Incorrect username or password.</div>
+  </div>
+
+  <script>
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      const error = document.getElementById("error-msg");
+
+      // Set your credentials here
+      const correctUser = "admin";
+      const correctPass = "Ranjan@123";
+
+      if (user === correctUser && pass === correctPass) {
+        window.location.href = "dashboard.html";
+      } else {
+        error.style.display = "block";
+      }
+    }
+  </script>
+</body>
+</html>
