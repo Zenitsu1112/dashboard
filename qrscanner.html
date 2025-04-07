@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>QR Code Generator & Scanner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0f172a;
+      color: #fff;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .card {
+      background: #1e293b;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 100%;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+    h2 {
+      color: #60a5fa;
+    }
+    input[type="text"],
+    input[type="file"] {
+      margin: 10px 0;
+      padding: 0.6rem;
+      border-radius: 8px;
+      border: none;
+      width: 100%;
+      background: #334155;
+      color: #fff;
+    }
+    button {
+      margin-top: 1rem;
+      background: #60a5fa;
+      border: none;
+      color: white;
+      padding: 0.6rem 1.5rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    canvas {
+      background: white;
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 10px;
+    }
+    #qrResult {
+      margin-top: 1rem;
+      word-break: break-word;
+    }
+    .download-btn {
+      margin-top: 1rem;
+      background: #10b981;
+    }
+    .dropzone {
+      margin-top: 10px;
+      border: 2px dashed #60a5fa;
+      border-radius: 10px;
+      padding: 30px;
+      background: #334155;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+    .dropzone.dragover {
+      background: #3b82f6;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>🔁 Text/URL → QR Generator</h2>
+    <input type="text" id="qrText" placeholder="Enter text or URL...">
+    <input type="file" id="logoInput" accept="image/*">
+    <button onclick="generateQR()">Generate QR</button>
+    <canvas id="qrCanvas" width="300" height="300"></canvas>
+    <br>
+    <button class="download-btn" onclick="downloadQR()">Download QR</button>
+  </div>
+
+  <div class="card">
+    <h2>📷 QR Image → Text Reader</h2>
+    <input type="file" id="qrImageInput" accept="image/*">
+    <div id="dropzone" class="dropzone">Drag & Drop QR Image Here</div>
+    <button onclick="scanQR()">Scan QR</button>
+    <p id="qrResult"></p>
+  </div>
+
+  <!-- Libs -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsqr/dist/jsQR.js"></script>
+
+  <script>
+    function generateQR() {
+      const text = document.getElementById("qrText").value.trim();
+      const canvas = document.getElementById("qrCanvas");
+      const logoFile = document.getElementById("logoInput").files[0];
+
+      if (!text) return alert("Please enter some text or URL!");
+
+      QRCode.toCanvas(canvas, text, { width: 300 }, function (error) {
+        if (error) {
+          console.error("QR Error:", error);
+          alert("QR generation failed.");
+          return;
+        }
+
+        if (logoFile) {
+          const ctx = canvas.getContext("2d");
+          const logo = new Image();
+          logo.src = URL.createObjectURL(logoFile);
+
+          logo.onload = function () {
+            const size = 60;
+            const x = (canvas.width - size) / 2;
+            const y = (canvas.height - size) / 2;
+
+            ctx.fillStyle = "#fff";
+            ctx.fillRect(x, y, size, size);
+            ctx.drawImage(logo, x, y, size, size);
+          };
+        }
+      });
+    }
+
+    function downloadQR() {
+      const canvas = document.getElementById("qrCanvas");
+      const link = document.createElement("a");
+      link.download = "myQR.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    }
+
+    async function scanQR(file = null) {
+      const resultDisplay = document.getElementById("qrResult");
+      resultDisplay.textContent = "Scanning...";
+
+      if (!file) {
+        file = document.getElementById("qrImageInput").files[0];
+      }
+      if (!file) return alert("Upload or drop a QR image first!");
+
+      const img = new Image();
+      img.src = URL.createObjectURL(file);
+
+      img.onload = function () {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const code = jsQR(imageData.data, canvas.width, canvas.height);
+
+        resultDisplay.textContent = code ? `QR Content: ${code.data}` : "⚠️ No QR code found.";
+      };
+    }
+
+    // Drag and Drop
+    const dropzone = document.getElementById("dropzone");
+    dropzone.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+    dropzone.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("dragover");
+      const file = e.dataTransfer.files[0];
+      if (file && file.type.startsWith("image/")) {
+        scanQR(file);
+      } else {
+        alert("Please drop a valid QR image!");
+      }
+    });
+  </script>
+</body>
+</html>
