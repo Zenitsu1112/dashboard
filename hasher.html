@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SHA-256 Hasher</title>
+</head>
+<body>
+  <h2>SHA-256 Password Hasher</h2>
+  <input type="text" id="inputText" placeholder="Enter your password">
+  <button onclick="hashSHA256()">Hash</button>
+  <p><strong>Hash:</strong> <span id="result"></span></p>
+
+  <script>
+    async function hashSHA256() {
+      const input = document.getElementById("inputText").value;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(input);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+      document.getElementById("result").textContent = hashHex;
+    }
+  </script>
+</body>
+</html>
