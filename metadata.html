@@ -3,11 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Image Metadata Extractor</title>
-  <script>
-    if (sessionStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "index.html";
-    }
-  </script>  
+  <script src="auth-check.js"></script> 
   <script src="https://cdn.jsdelivr.net/npm/exif-js"></script>
   <style>
     body {

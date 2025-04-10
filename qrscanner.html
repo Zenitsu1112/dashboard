@@ -3,11 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>QR Code Generator & Scanner</title>
-  <script>
-    if (sessionStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "index.html";
-    }
-  </script>  
+  <script src="auth-check.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {

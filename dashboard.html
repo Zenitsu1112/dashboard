@@ -228,10 +228,9 @@
     </a>
   </div>
 
+  <script src="auth-check.js"></script>
   <script>
-    if (sessionStorage.getItem("isLoggedIn") !== "true") {
-      window.location.href = "index.html"; // Redirect to login if not logged in
-    }
+   
 
     const searchInput = document.getElementById('search');
     const grid = document.getElementById('toolGrid');
