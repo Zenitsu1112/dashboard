@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Secure Login</title>
   <style>
     body {
@@ -19,7 +20,7 @@
       background: #1e293b;
       padding: 2rem;
       border-radius: 1rem;
-      box-shadow: 0 0 20px rgba(0,0,0,0.3);
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
       width: 300px;
       text-align: center;
     }
@@ -50,6 +51,7 @@
     }
   </style>
 </head>
+
 <body>
   <div class="login-box">
     <h2>Login</h2>
@@ -59,27 +61,28 @@
   </div>
 
   <script>
-  (function(){
-    async function _0xsha256(_0xinput){
-      const _0xencoder=new TextEncoder();
-      const _0xdata=_0xencoder.encode(_0xinput);
-      const _0xhash=await crypto.subtle.digest("SHA-256",_0xdata);
-      const _0xhashArray=Array.from(new Uint8Array(_0xhash));
-      return _0xhashArray.map(b=>b.toString(16).padStart(2,"0")).join("");
-    }
-
-    window.login=async function(){
-      const _0xinput=document.getElementById("password").value.trim();
-      const _0xhashed=await _0xsha256(_0xinput);
-      const _0xcorrect="8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4";
-      if(_0xhashed===_0xcorrect){
-        window.location.href="dashboard.html";
-      }else{
-        document.getElementById("error-msg").style.display="block";
+    (function () {
+      async function _0xsha256(_0xinput) {
+        const _0xencoder = new TextEncoder();
+        const _0xdata = _0xencoder.encode(_0xinput);
+        const _0xhash = await crypto.subtle.digest("SHA-256", _0xdata);
+        const _0xhashArray = Array.from(new Uint8Array(_0xhash));
+        return _0xhashArray.map(b => b.toString(16).padStart(2, "0")).join("");
       }
-    };
-  })();
+
+      window.login = async function () {
+        const _0xinput = document.getElementById("password").value.trim();
+        const _0xhashed = await _0xsha256(_0xinput);
+        const _0xcorrect = "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4";
+        if (_0xhashed === _0xcorrect) {
+          sessionStorage.setItem("isLoggedIn", "true"); // ✅ mark session as logged in
+          window.location.href = "dashboard.html";
+        } else {
+          document.getElementById("error-msg").style.display = "block";
+        }
+      };
+    })();
   </script>
 </body>
-</html>
 
+</html>

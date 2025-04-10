@@ -210,7 +210,8 @@
     </a>
 
     <a href="hasher.html" class="card" data-name="Hasher">
-      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqSPbstyfOJwHPb9oIM0NKhdM--W5nQjFVlQ&s" alt="Hasher">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRqSPbstyfOJwHPb9oIM0NKhdM--W5nQjFVlQ&s"
+        alt="Hasher">
       <div class="card-title">Hasher</div>
     </a>
 
@@ -228,6 +229,10 @@
   </div>
 
   <script>
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "index.html"; // Redirect to login if not logged in
+    }
+
     const searchInput = document.getElementById('search');
     const grid = document.getElementById('toolGrid');
     const darkToggle = document.getElementById('darkModeToggle');

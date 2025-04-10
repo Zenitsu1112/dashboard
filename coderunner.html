@@ -4,6 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quick Code Runner</title>
+  <script>
+    if (sessionStorage.getItem("isLoggedIn") !== "true") {
+      window.location.href = "index.html";
+    }
+  </script>  
   <style>
     * {
       box-sizing: border-box;
