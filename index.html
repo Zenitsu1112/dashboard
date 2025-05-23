@@ -72,9 +72,15 @@
       window.login = async function () {
         const _0xinput = document.getElementById("password").value.trim();
         const _0xhashed = await _0xsha256(_0xinput);
-        const _0xcorrect = "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4";
-        if (_0xhashed === _0xcorrect) {
-          localStorage.setItem("isLoggedIn", "true"); // ✅ now persistent
+
+        // ✅ Add as many valid SHA-256 hashes as you want here:
+        const validHashes = [
+          "8f434346648f6b96df89dda901c5176b10a6d83961dd3c1ac88b59b2dc327aa4", // valid password #1
+          "fe91a760983d401d9b679fb092b689488d1f46d92f3af5e9e93363326f3e8aa4",
+        ];
+
+        if (validHashes.includes(_0xhashed)) {
+          localStorage.setItem("isLoggedIn", "true");
           window.location.href = "dashboard.html";
         } else {
           document.getElementById("error-msg").style.display = "block";
@@ -82,6 +88,7 @@
       };
     })();
   </script>
+
 </body>
 
 </html>
