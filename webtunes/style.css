@@ -1,43 +1,18 @@
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: #121212;
-  color: #fff;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-#app {
+  font-family: sans-serif;
   text-align: center;
-  max-width: 400px;
+  padding-top: 50px;
+  background: #111;
+  color: #fff;
 }
 
-#login-btn {
-  padding: 10px 20px;
-  font-size: 16px;
-  background: #1db954;
-  color: #fff;
+button {
+  background: #1DB954;
   border: none;
+  color: white;
+  padding: 15px 30px;
+  font-size: 16px;
   border-radius: 25px;
   cursor: pointer;
-  margin-top: 20px;
 }
 
-#now-playing {
-  margin-top: 30px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#album-art {
-  width: 250px;
-  border-radius: 15px;
-  margin-bottom: 15px;
-}
-
-.hidden {
-  display: none;
-}
