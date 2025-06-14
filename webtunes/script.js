@@ -1,7 +1,3 @@
-// Redirect to Spotify login
-const CLIENT_ID = 'bbc6b6defc62472a8b4752b6dc82573a';
-const REDIRECT_URI = 'https://austin11.netlify.app/webtunes/'; // or your Netlify site
-
 function redirectToSpotifyLogin() {
   const scopes = [
     'user-read-playback-state',
@@ -9,8 +5,15 @@ function redirectToSpotifyLogin() {
     'user-read-private'
   ].join('%20');
 
-  window.location.href = `https://accounts.spotify.com/authorize?client_id=${CLIENT_ID}&response_type=token&redirect_uri=${REDIRECT_URI}&scope=${scopes}`;
+  const authUrl = `https://accounts.spotify.com/authorize` +
+    `?client_id=${CLIENT_ID}` +
+    `&response_type=token` +
+    `&redirect_uri=${encodeURIComponent(REDIRECT_URI)}` +  // ✅ must encode
+    `&scope=${scopes}`;
+
+  window.location.href = authUrl;
 }
+
 
 document.getElementById('login-btn').addEventListener('click', redirectToSpotifyLogin);
 
