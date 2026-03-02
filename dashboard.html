@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --bg: transparent;
+      --bg: #0f172a; /* Fallback color */
       --text: #ffffff;
       --card: rgba(0, 0, 0, 0.7);
       --accent: #60a5fa;
@@ -25,6 +25,7 @@
       background-color: var(--bg);
       color: var(--text);
       transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
     }
 
     .video-bg {
@@ -54,6 +55,11 @@
       max-width: 100%;
       background-color: var(--card);
       color: var(--text);
+      outline: none;
+    }
+
+    .search-bar:focus {
+      border-color: var(--accent);
     }
 
     .controls-wrapper {
@@ -164,30 +170,26 @@
 
 <body>
 
-  <!-- Background Video -->
   <video autoplay muted loop class="video-bg" id="bgVideo">
     <source src="video.mp4" type="video/mp4" />
     Your browser does not support the video tag.
   </video>
 
-  <!-- Background Music -->
-  <audio id="bgMusic" src="audio.m4a" loop autoplay></audio>
+  <audio id="bgMusic" src="audio.m4a" loop></audio>
 
   <div class="header">
     <input id="search" class="search-bar" type="text" placeholder="Search or enter #comein..." />
 
     <div class="controls-wrapper">
-      <!-- Dark Mode -->
       <label>Dark Mode</label>
       <label class="switch">
         <input type="checkbox" id="darkModeToggle">
         <span class="slider"></span>
       </label>
 
-      <!-- Media Controls -->
       <div class="media-controls">
         <button onclick="rewindAudio()">⏮️</button>
-        <button onclick="toggleAudio()" id="playPauseBtn">⏸️</button>
+        <button onclick="toggleAudio()" id="playPauseBtn">▶️</button>
         <button onclick="forwardAudio()">⏭️</button>
       </div>
     </div>
@@ -221,39 +223,41 @@
     </a>
 
     <a href="pdf-image-tool.html" class="card" data-name="PDF ↔ Image Tool">
-      <img
-        src="https://play-lh.googleusercontent.com/PYX0sl2hdU_jdMzZZT5EjAMNUoXY4MZg2IUK9hkSBMEjooLcLt_x8vzJ0VwWxEGx3f0"
-        alt="PDF Image Tool">
+      <img src="https://img.icons8.com/color/96/pdf.png" alt="PDF Image Tool">
       <div class="card-title">PDF ↔ Image Tool</div>
     </a>
   </div>
 
   <script src="auth-check.js"></script>
   <script>
-   
-
     const searchInput = document.getElementById('search');
     const grid = document.getElementById('toolGrid');
     const darkToggle = document.getElementById('darkModeToggle');
     const bgMusic = document.getElementById('bgMusic');
     const playPauseBtn = document.getElementById('playPauseBtn');
 
-    // Search filter
+    // Combined Search and Secret Redirect
+    searchInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const val = searchInput.value.trim().toLowerCase();
+        if (val === '#comein') {
+          window.location.href = 'secret.html';
+        }
+      }
+    });
+
+    // Real-time filtering
     searchInput.addEventListener('input', () => {
       const val = searchInput.value.trim().toLowerCase();
-      if (val === '#comein') {
-        window.location.href = 'secret.html';
-        return;
-      }
-
       const cards = grid.querySelectorAll('.card');
+      
       cards.forEach(card => {
         const name = card.getAttribute('data-name').toLowerCase();
         card.style.display = name.includes(val) ? '' : 'none';
       });
     });
 
-    // Dark mode
+    // Dark mode persistent state
     darkToggle.addEventListener('change', () => {
       document.body.classList.toggle('dark', darkToggle.checked);
       localStorage.setItem('darkMode', darkToggle.checked);
@@ -265,10 +269,10 @@
       document.body.classList.toggle('dark', isDark);
     });
 
-    // Media controls
+    // Media controls logic
     function toggleAudio() {
       if (bgMusic.paused) {
-        bgMusic.play();
+        bgMusic.play().catch(e => console.log("Audio play blocked by browser. Interact with the page first."));
         playPauseBtn.textContent = '⏸️';
       } else {
         bgMusic.pause();
@@ -281,10 +285,10 @@
     }
 
     function forwardAudio() {
-      bgMusic.currentTime = bgMusic.duration - 1;
+      // Skips 10 seconds forward instead of killing the song
+      bgMusic.currentTime = Math.min(bgMusic.duration, bgMusic.currentTime + 10);
     }
   </script>
 
 </body>
-
 </html>
